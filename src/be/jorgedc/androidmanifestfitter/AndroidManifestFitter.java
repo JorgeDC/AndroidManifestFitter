@@ -47,6 +47,7 @@ public class AndroidManifestFitter extends AnAction {
                 androidManifest = androidManifest.replace("</application>", "\n <activity android:name=\"" + packageName + "\" /> \n\n </application>");
                 Runnable writeAction = new WriteAction(androidManifest, document);
                 ApplicationManager.getApplication().runWriteAction(writeAction);
+
             }
         }
     }
@@ -105,7 +106,10 @@ public class AndroidManifestFitter extends AnAction {
     }
 
     private boolean androidManifestContainsActivity(String packageName, String className, Document document) {
-        return document.getCharsSequence().toString().contains(packageName) || document.getCharsSequence().toString().contains("android:name=\"" + className.replace(".", "") + "\"") || document.getCharsSequence().toString().contains("android:name=\"" + packageName + "\"");
+        return document.getCharsSequence().toString().contains(packageName)
+                || document.getCharsSequence().toString().contains("android:name=\"" + className.replace(".", "") + "\"")
+                || document.getCharsSequence().toString().contains("android:name=\"" + packageName + "\"")
+                || document.getCharsSequence().toString().contains(className);
     }
 
     private VirtualFile getVirtualFile(AnActionEvent e) {
