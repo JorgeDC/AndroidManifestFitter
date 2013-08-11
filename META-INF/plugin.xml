@@ -2,7 +2,7 @@
   <id>be.jorgedc.androidmanifestfitter</id>
   <name>Add Activity to AndroidManifest</name>
   <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <vendor email="jorgedecorte@gmail.com">JorgeDeCorte</vendor>
 
   <description><![CDATA[
       Enter short description for your plugin here.<br>
@@ -10,8 +10,7 @@
       ]]></description>
 
   <change-notes><![CDATA[
-      Add change notes here.<br>
-      <small>most HTML tags may be used</small>
+      Versoin 1.0 of adding the Activity to the AndroidManifest.xml
       ]]>
   </change-notes>
 
