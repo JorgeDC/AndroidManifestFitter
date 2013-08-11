@@ -25,8 +25,7 @@ import java.util.Stack;
 
 public class AndroidManifestFitter extends AnAction {
     public void actionPerformed(AnActionEvent e) {
-        DataContext dataContext = e.getDataContext();
-        VirtualFile vFile = DataKeys.VIRTUAL_FILE.getData(dataContext);
+        VirtualFile vFile = getVirtualFile(e);
         VirtualFile parent = vFile.getParent();
         String packageName = "";
         if (parent != null) {
@@ -67,7 +66,34 @@ public class AndroidManifestFitter extends AnAction {
             int i = 20;
             while (i > 0 && psiClass.getSuperClass() != null) {
                 if (psiClass.getSuperClass().toString().toLowerCase().equals("psiclass:activity")) {
-                    e.getPresentation().setEnabled(true);
+                    VirtualFile vFile = getVirtualFile(e);
+                    VirtualFile parent = vFile.getParent();
+                    String packageName = "";
+                    if (parent != null) {
+                        int p = 100;
+                        while (p > 0 && parent != null && (!parent.getName().equals("main") && (!parent.getName().equals("java")) && (!parent.getName().equals("src")))) {
+                            packageName = parent.getName() + "." + packageName;
+                            parent = parent.getParent();
+                            p--;
+                        }
+                    }
+                    String className = vFile.getPresentableName().replace(".java", "");
+                    packageName += className;
+                    VirtualFile virtualFile[] = parent.getParent().getChildren();
+                    for (int s = 0; s < virtualFile.length; s++) {
+                        VirtualFile childFile = virtualFile[s];
+                        Document document = FileDocumentManager.getInstance().getCachedDocument(childFile);
+                        if (document != null && document.isWritable() && childFile.getPresentableName().toLowerCase().equals("androidmanifest.xml")) {
+                            if (androidManifestContainsActivity(packageName, className, document)) {
+                                e.getPresentation().setEnabled(false);
+                                return;
+                            } else {
+                                e.getPresentation().setEnabled(true);
+                                return;
+                            }
+                        }
+                    }
+                    e.getPresentation().setEnabled(false);
                     return;
                 }
                 psiClass = psiClass.getSuperClass();
@@ -77,5 +103,15 @@ public class AndroidManifestFitter extends AnAction {
         }
         e.getPresentation().setEnabled(false);
     }
+
+    private boolean androidManifestContainsActivity(String packageName, String className, Document document) {
+        return document.getCharsSequence().toString().contains(packageName) || document.getCharsSequence().toString().contains("android:name=\"" + className.replace(".", "") + "\"") || document.getCharsSequence().toString().contains("android:name=\"" + packageName + "\"");
+    }
+
+    private VirtualFile getVirtualFile(AnActionEvent e) {
+        DataContext dataContext = e.getDataContext();
+        return DataKeys.VIRTUAL_FILE.getData(dataContext);
+    }
+
 
 }
